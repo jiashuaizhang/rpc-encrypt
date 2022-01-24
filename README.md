@@ -32,16 +32,21 @@
 
 ##### 1.2.2 客户端处理流程
 
-![client_sign](src\test\java\resources\client_sign.png)
+![client_sign](src/test/java/resources/client_sign.png)
 
 ##### 1.2.3 服务端端处理流程
 
-![server_validate](src\test\java\resources\server_validate.png)
+![server_validate](src/test/java/resources/server_validate.png)
 
 ##### 1.2.4 程序设计
-![UML](src\test\java\resources\UML.png)
+![UML](src/test/java/resources/UML.png)
 
 ### 二、代码实现
 
 - github
+
+  https://github.com/jiashuaizhang/rpc-encrypt
+
 - gitee
+
+  https://gitee.com/cheapCabbage/rpc-encrypt
