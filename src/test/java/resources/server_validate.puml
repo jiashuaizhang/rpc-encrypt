@@ -1,0 +1,15 @@
+@startuml
+
+autonumber
+
+Invoker -> Signature: Request{clientId,encryptPayload}
+Signature -> STORAGE: findClientInfo(clientId)
+Signature <-- STORAGE: ClientInfo{priKey,clientSecret}
+Signature -> Digest: HMAC(encryptPayload,clientSecret + pubKey) & validate
+Signature <-- Digest: digest
+Signature -> Signature: sign = RSADec(priKey) + "." + digest) & validate
+Signature -> Cipher: AESDec(clientSecret,encryptPayload)
+Signature <-- Cipher: payload
+Invoker <-- Signature: Response{payload}
+
+@enduml

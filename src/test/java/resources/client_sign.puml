@@ -1,0 +1,13 @@
+@startuml
+
+autonumber
+
+Invoker -> Signature: Request{clientId,clientSecret,payload}
+Signature -> Cipher: AESEnc(clientSecret,payload)
+Signature <-- Cipher: encryptPayload
+Signature -> Digest: HMAC(encryptPayload,clientSecret + pubKey)
+Signature <-- Digest: digest
+Signature -> Signature: sign = RSAEnc(pubKey) + "." + digest)
+Invoker <-- Signature: Response{encryptPayload,sign}
+
+@enduml
