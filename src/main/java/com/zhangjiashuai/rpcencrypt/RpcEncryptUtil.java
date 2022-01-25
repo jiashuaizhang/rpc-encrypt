@@ -15,15 +15,15 @@ public class RpcEncryptUtil {
     private RpcEncryptUtil() {
     }
 
-    public static RequestPayload work(StatefulRequestPayload requestPayload) throws SignatureMismatchException {
+    public static StatefulRequestPayload work(StatefulRequestPayload requestPayload) throws SignatureMismatchException {
         return RPC_ENCRYPT.work(requestPayload);
     }
 
-    public static RequestPayload serverValidate(StatefulRequestPayload requestPayload) throws SignatureMismatchException {
+    public static StatefulRequestPayload serverValidate(StatefulRequestPayload requestPayload) throws SignatureMismatchException {
         return RPC_ENCRYPT.serverValidate(requestPayload);
     }
 
-    public RequestPayload clientSign(StatefulRequestPayload requestPayload) {
+    public StatefulRequestPayload clientSign(StatefulRequestPayload requestPayload) {
         return RPC_ENCRYPT.clientSign(requestPayload);
     }
 

@@ -1,7 +1,5 @@
 package com.zhangjiashuai.rpcencrypt.entity;
 
-import com.zhangjiashuai.rpcencrypt.common.Mode;
-
 /**
  * 请求报文
  */
@@ -18,16 +16,11 @@ public class RequestPayload {
      * 报文
      */
     private String payload;
-    /**
-     * 运行模式
-     */
-    private Mode mode;
 
-    public RequestPayload(ClientInfo clientInfo, String sign, String payload, Mode mode) {
+    public RequestPayload(ClientInfo clientInfo, String sign, String payload) {
         this.clientInfo = clientInfo;
         this.sign = sign;
         this.payload = payload;
-        this.mode = mode;
     }
 
     public RequestPayload() {
@@ -57,21 +50,12 @@ public class RequestPayload {
         this.payload = payload;
     }
 
-    public Mode getMode() {
-        return mode;
-    }
-
-    public void setMode(Mode mode) {
-        this.mode = mode;
-    }
-
     @Override
     public String toString() {
         return "RequestPayload{" +
                 "clientInfo=" + clientInfo +
                 ", sign='" + sign + '\'' +
                 ", payload='" + payload + '\'' +
-                ", mode=" + mode +
                 '}';
     }
 }

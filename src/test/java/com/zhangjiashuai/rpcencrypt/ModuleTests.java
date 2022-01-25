@@ -5,12 +5,11 @@ import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
 import com.zhangjiashuai.rpcencrypt.cipher.AESCipher;
 import com.zhangjiashuai.rpcencrypt.cipher.Cipher;
+import com.zhangjiashuai.rpcencrypt.common.Mode;
 import com.zhangjiashuai.rpcencrypt.entity.ClientInfo;
-import com.zhangjiashuai.rpcencrypt.entity.RequestPayload;
 import com.zhangjiashuai.rpcencrypt.entity.StatefulRequestPayload;
 import com.zhangjiashuai.rpcencrypt.sign.RSASignature;
 import com.zhangjiashuai.rpcencrypt.sign.Signature;
-import com.zhangjiashuai.rpcencrypt.common.Mode;
 import com.zhangjiashuai.rpcencrypt.sign.SignatureMismatchException;
 import com.zhangjiashuai.rpcencrypt.storage.ClientInfoStorage;
 import com.zhangjiashuai.rpcencrypt.storage.InMemoryClientInfoStorage;
@@ -101,7 +100,7 @@ public class ModuleTests {
         RpcEncryptUtil.setRpcEncrypt(rpcEncrypt);
         // run
         try {
-            RequestPayload requestPayload = RpcEncryptUtil.work(ModuleTests.requestPayload);
+            StatefulRequestPayload requestPayload = RpcEncryptUtil.work(ModuleTests.requestPayload);
             System.out.println(requestPayload);
             System.out.println();
 

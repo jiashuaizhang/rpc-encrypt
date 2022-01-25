@@ -46,7 +46,7 @@ public class RpcEncrypt {
      * @param requestPayload
      * @return
      */
-    RequestPayload work(StatefulRequestPayload requestPayload) throws SignatureMismatchException {
+    StatefulRequestPayload work(StatefulRequestPayload requestPayload) throws SignatureMismatchException {
         if (requestPayload.isFillClientInfo()) {
             ClientInfo clientInfo = clientInfoStorage.find(requestPayload.getClientInfo());
             if (clientInfo == null) {
@@ -66,7 +66,7 @@ public class RpcEncrypt {
      * @param requestPayload
      * @return
      */
-    public RequestPayload serverValidate(StatefulRequestPayload requestPayload) throws SignatureMismatchException {
+    public StatefulRequestPayload serverValidate(StatefulRequestPayload requestPayload) throws SignatureMismatchException {
         signature.serverValidate(requestPayload);
         return requestPayload;
     }
@@ -77,7 +77,7 @@ public class RpcEncrypt {
      * @param requestPayload
      * @return
      */
-    public RequestPayload clientSign(StatefulRequestPayload requestPayload) {
+    public StatefulRequestPayload clientSign(StatefulRequestPayload requestPayload) {
         signature.clientSign(requestPayload);
         return requestPayload;
     }

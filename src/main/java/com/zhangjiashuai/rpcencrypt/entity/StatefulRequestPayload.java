@@ -7,6 +7,10 @@ import com.zhangjiashuai.rpcencrypt.common.Mode;
  */
 public class StatefulRequestPayload extends RequestPayload {
     /**
+     * 运行模式
+     */
+    private Mode mode = Mode.CLIENT;
+    /**
      * 签名之前是否加密
      * 默认为true,如果签名前已经显示执行过加密，需手动设置为false
      */
@@ -25,20 +29,15 @@ public class StatefulRequestPayload extends RequestPayload {
     private boolean fillClientInfo = true;
 
     public StatefulRequestPayload(RequestPayload requestPayload) {
-        this(requestPayload.getClientInfo(), requestPayload.getSign(), requestPayload.getPayload(), requestPayload.getMode());
+        this(requestPayload.getClientInfo(), requestPayload.getSign(), requestPayload.getPayload(), Mode.CLIENT);
     }
 
     public StatefulRequestPayload() {
     }
 
     public StatefulRequestPayload(ClientInfo clientInfo, String sign, String payload, Mode mode) {
-        super(clientInfo, sign, payload, mode);
-    }
-
-    public StatefulRequestPayload(boolean encryptBeforeSign, boolean decryptAfterValidate, boolean fillClientInfo) {
-        this.encryptBeforeSign = encryptBeforeSign;
-        this.decryptAfterValidate = decryptAfterValidate;
-        this.fillClientInfo = fillClientInfo;
+        super(clientInfo, sign, payload);
+        this.mode = mode;
     }
 
     public boolean isEncryptBeforeSign() {
@@ -65,12 +64,21 @@ public class StatefulRequestPayload extends RequestPayload {
         this.fillClientInfo = fillClientInfo;
     }
 
+    public Mode getMode() {
+        return mode;
+    }
+
+    public void setMode(Mode mode) {
+        this.mode = mode;
+    }
+
     @Override
     public String toString() {
         return "StatefulRequestPayload{" +
                 "encryptBeforeSign=" + encryptBeforeSign +
                 ", decryptAfterValidate=" + decryptAfterValidate +
                 ", fillClientInfo=" + fillClientInfo +
+                ", mode=" + mode +
                 "} " + super.toString();
     }
 }
