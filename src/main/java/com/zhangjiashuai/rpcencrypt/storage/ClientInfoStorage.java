@@ -14,6 +14,9 @@ public interface ClientInfoStorage {
     ClientInfo findByClientId(String clientId);
 
     default ClientInfo find(ClientInfo clientInfo) {
+        if (clientInfo == null) {
+            return null;
+        }
         ClientInfo got = findByClientId(clientInfo.getClientId());
         if (got == null) {
             return null;

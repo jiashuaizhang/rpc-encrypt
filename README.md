@@ -34,9 +34,9 @@
 
 程序参与方:
 - Invoker: 调用者，即程序引用方;
-- Signature: 签名接口，默认实现为RSA. 持有Digest和Cipher的引用;
 - Digest: 摘要接口，默认实现为HMAC;
-- Cipher: 加密接口，默认实现为AES;
+- Cipher: 对称加密接口，默认实现为AES;
+- Signature: 签名接口，默认的非对称加密实现为RSA; 持有Digest和Cipher的引用; 签名由非对称加密后的少量信息，加上经Cipher加密后的密文摘要两部分组成；
 - Storage: 存储接口，默认实现为内存。
 
 ![client_sign](src/test/java/resources/client_sign.png)

@@ -1,7 +1,9 @@
 package com.zhangjiashuai.rpcencrypt.sign;
 
+import com.zhangjiashuai.rpcencrypt.cipher.Cipher;
 import com.zhangjiashuai.rpcencrypt.common.Algorithm;
 import com.zhangjiashuai.rpcencrypt.common.Mode;
+import com.zhangjiashuai.rpcencrypt.digest.Digest;
 import com.zhangjiashuai.rpcencrypt.entity.ClientInfo;
 import com.zhangjiashuai.rpcencrypt.entity.RequestPayload;
 import com.zhangjiashuai.rpcencrypt.entity.StatefulRequestPayload;
@@ -28,4 +30,8 @@ public interface Signature extends Algorithm {
      * @return [公钥,私钥]
      */
     String[] generateKeyPair();
+
+    void setDigest(Digest digest);
+
+    void setCipher(Cipher cipher);
 }

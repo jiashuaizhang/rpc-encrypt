@@ -6,7 +6,7 @@
 
     <groupId>com.zhangjiashuai.rpc-encrypt</groupId>
     <artifactId>rpc-encrypt</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0</version>
     <properties>
         <java.version>1.8</java.version>
         <hutool.version>5.7.17</hutool.version>

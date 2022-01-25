@@ -11,7 +11,6 @@ import com.zhangjiashuai.rpcencrypt.cipher.Cipher;
 import com.zhangjiashuai.rpcencrypt.digest.Digest;
 import com.zhangjiashuai.rpcencrypt.digest.HMACDigest;
 import com.zhangjiashuai.rpcencrypt.entity.ClientInfo;
-import com.zhangjiashuai.rpcencrypt.entity.RequestPayload;
 import com.zhangjiashuai.rpcencrypt.entity.StatefulRequestPayload;
 
 import java.security.KeyPair;
@@ -39,16 +38,19 @@ public class RSASignature implements Signature {
     @Override
     public String clientSign(StatefulRequestPayload requestPayload) {
         ClientInfo clientInfo = requestPayload.getClientInfo();
+        // signature part 1
         AsymmetricCrypto clientCrypto = new AsymmetricCrypto(ALGORITHM, null, clientInfo.getPublicKeyServer());
         byte[] data = StrUtil.bytes(getStr2Sign(requestPayload));
         byte[] clientEncrypt = clientCrypto.encrypt(data, KeyType.PublicKey);
         String clientEncryptStr = Base64Encoder.encode(clientEncrypt);
         String payload;
+        // encrypt the payload
         if (requestPayload.isEncryptBeforeSign()) {
             payload = cipher.encrypt(requestPayload);
         } else {
             payload = requestPayload.getPayload();
         }
+        // signature part 2
         String digestStr = digest.digestPayload(payload, clientInfo);
         String sign = clientEncryptStr + SIGN_SEPARATOR + digestStr;
         requestPayload.setSign(sign);
@@ -64,12 +66,14 @@ public class RSASignature implements Signature {
         }
         String[] signArray = clientSign.split("\\" + SIGN_SEPARATOR);
         if (signArray.length != 2) {
-            throw new SignatureMismatchException("invalid arguments");
+            throw new SignatureMismatchException("invalid arguments: " + clientSign);
         }
+        // digest validate (signature part 2)
         String digestStr = digest.digestPayload(requestPayload);
         if (!digestStr.equals(signArray[1])) {
             throw new SignatureMismatchException("digest mismatch");
         }
+        // asymmetric validate (signature part 1)
         ClientInfo clientInfo = requestPayload.getClientInfo();
         AsymmetricCrypto serverCrypto = new AsymmetricCrypto(ALGORITHM, clientInfo.getPrivateKeyServer(), clientInfo.getPublicKeyServer());
         byte[] serverDecrypt = serverCrypto.decrypt(signArray[0], KeyType.PrivateKey);
@@ -77,6 +81,7 @@ public class RSASignature implements Signature {
         if (!serverDecryptStr.equals(getStr2Sign(requestPayload))) {
             throw new SignatureMismatchException("signature mismatch");
         }
+        // decrypt the payload
         if (requestPayload.isDecryptAfterValidate()) {
             String decryptStr = cipher.decrypt(requestPayload);
             requestPayload.setPayload(decryptStr);
@@ -93,5 +98,23 @@ public class RSASignature implements Signature {
     public String[] generateKeyPair() {
         KeyPair keyPair = KeyUtil.generateKeyPair(getAlgorithm());
         return new String[]{Base64Encoder.encode(keyPair.getPrivate().getEncoded()), Base64Encoder.encode(keyPair.getPublic().getEncoded())};
+    }
+
+    public Digest getDigest() {
+        return digest;
+    }
+
+    @Override
+    public void setDigest(Digest digest) {
+        this.digest = digest;
+    }
+
+    public Cipher getCipher() {
+        return cipher;
+    }
+
+    @Override
+    public void setCipher(Cipher cipher) {
+        this.cipher = cipher;
     }
 }

@@ -11,6 +11,7 @@ import com.zhangjiashuai.rpcencrypt.entity.StatefulRequestPayload;
 import com.zhangjiashuai.rpcencrypt.sign.RSASignature;
 import com.zhangjiashuai.rpcencrypt.sign.Signature;
 import com.zhangjiashuai.rpcencrypt.common.Mode;
+import com.zhangjiashuai.rpcencrypt.sign.SignatureMismatchException;
 import com.zhangjiashuai.rpcencrypt.storage.ClientInfoStorage;
 import com.zhangjiashuai.rpcencrypt.storage.InMemoryClientInfoStorage;
 import org.junit.jupiter.api.BeforeAll;
@@ -82,9 +83,13 @@ public class ModuleTests {
         signature.clientSign(requestPayload);
         System.out.println(requestPayload);
         System.out.println();
-        boolean validate = signature.serverValidate(requestPayload);
-        Assert.isTrue(validate);
-        System.out.println(requestPayload);
+        try {
+            boolean validate = signature.serverValidate(requestPayload);
+            Assert.isTrue(validate);
+            System.out.println(requestPayload);
+        } catch (SignatureMismatchException e) {
+            e.printStackTrace();
+        }
     }
 
     @Test
@@ -95,14 +100,18 @@ public class ModuleTests {
         RpcEncrypt rpcEncrypt = RpcEncrypt.builder().signature(new RSASignature()).clientInfoStorage(clientInfoStorage).build();
         RpcEncryptUtil.setRpcEncrypt(rpcEncrypt);
         // run
-        RequestPayload requestPayload = RpcEncryptUtil.work(ModuleTests.requestPayload);
-        System.out.println(requestPayload);
-        System.out.println();
+        try {
+            RequestPayload requestPayload = RpcEncryptUtil.work(ModuleTests.requestPayload);
+            System.out.println(requestPayload);
+            System.out.println();
 
-        requestPayload.setMode(Mode.SERVER);
-        requestPayload = RpcEncryptUtil.work(ModuleTests.requestPayload);
-        System.out.println(requestPayload);
+            requestPayload.setMode(Mode.SERVER);
+            requestPayload = RpcEncryptUtil.work(ModuleTests.requestPayload);
+            System.out.println(requestPayload);
 
-        Assert.notNull(requestPayload);
+            Assert.notNull(requestPayload);
+        } catch (SignatureMismatchException e) {
+            e.printStackTrace();
+        }
     }
 }

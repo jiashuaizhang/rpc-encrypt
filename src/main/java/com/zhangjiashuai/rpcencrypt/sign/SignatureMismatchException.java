@@ -1,6 +1,6 @@
 package com.zhangjiashuai.rpcencrypt.sign;
 
-public class SignatureMismatchException extends RuntimeException {
+public class SignatureMismatchException extends Exception {
 
     public SignatureMismatchException() {
     }

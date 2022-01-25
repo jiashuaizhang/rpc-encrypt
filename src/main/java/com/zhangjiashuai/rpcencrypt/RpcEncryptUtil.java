@@ -2,26 +2,24 @@ package com.zhangjiashuai.rpcencrypt;
 
 import com.zhangjiashuai.rpcencrypt.entity.RequestPayload;
 import com.zhangjiashuai.rpcencrypt.entity.StatefulRequestPayload;
-import com.zhangjiashuai.rpcencrypt.sign.RSASignature;
-import com.zhangjiashuai.rpcencrypt.storage.InMemoryClientInfoStorage;
+import com.zhangjiashuai.rpcencrypt.sign.SignatureMismatchException;
 
 /**
  * 静态访问工具
  */
 public class RpcEncryptUtil {
 
-    private static final RpcEncrypt DEFAULT_RPC_ENCRYPT = RpcEncrypt.builder().clientInfoStorage(new InMemoryClientInfoStorage())
-            .signature(new RSASignature()).build();
+    private static final RpcEncrypt DEFAULT_RPC_ENCRYPT = RpcEncrypt.builder().build();
     private static RpcEncrypt RPC_ENCRYPT = DEFAULT_RPC_ENCRYPT;
 
     private RpcEncryptUtil() {
     }
 
-    public static RequestPayload work(StatefulRequestPayload requestPayload) {
+    public static RequestPayload work(StatefulRequestPayload requestPayload) throws SignatureMismatchException {
         return RPC_ENCRYPT.work(requestPayload);
     }
 
-    public static RequestPayload serverValidate(StatefulRequestPayload requestPayload) {
+    public static RequestPayload serverValidate(StatefulRequestPayload requestPayload) throws SignatureMismatchException {
         return RPC_ENCRYPT.serverValidate(requestPayload);
     }
 
