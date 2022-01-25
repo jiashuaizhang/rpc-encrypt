@@ -7,9 +7,12 @@ import com.zhangjiashuai.rpcencrypt.cipher.AESCipher;
 import com.zhangjiashuai.rpcencrypt.cipher.Cipher;
 import com.zhangjiashuai.rpcencrypt.entity.ClientInfo;
 import com.zhangjiashuai.rpcencrypt.entity.RequestPayload;
+import com.zhangjiashuai.rpcencrypt.entity.StatefulRequestPayload;
 import com.zhangjiashuai.rpcencrypt.sign.RSASignature;
 import com.zhangjiashuai.rpcencrypt.sign.Signature;
 import com.zhangjiashuai.rpcencrypt.common.Mode;
+import com.zhangjiashuai.rpcencrypt.storage.ClientInfoStorage;
+import com.zhangjiashuai.rpcencrypt.storage.InMemoryClientInfoStorage;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -17,6 +20,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -26,11 +30,12 @@ public class ModuleTests {
     private Signature signature = new RSASignature();
     private Cipher cipher = new AESCipher();
 
-    private static RequestPayload requestPayload;
+    private static StatefulRequestPayload requestPayload;
 
     @BeforeAll
     static void init() throws IOException {
-        requestPayload = new RequestPayload();
+        requestPayload = new StatefulRequestPayload();
+        requestPayload.setMode(Mode.CLIENT);
         ClientInfo clientInfo = new ClientInfo();
         requestPayload.setClientInfo(clientInfo);
         requestPayload.setPayload("[MIICdQIBADANBgkqhkiG9w0BAQEFAASCAl8wggJbAgEAAoGBAIT/auDnUhe8G/rq5E8EdgNg0rPzd9+f7A+SQctc9YFUHdT7x8Xd1bZgr3WZevgzFglM2X6yxkzeEUscguD0A0zXTzLFcCWveHIEOLi+HTyz+u35kT9j3RY6ZcHoPL+iX/2vU2cDO7fsjUIXrTIaywpqFu9K6+8Mn5f+1chgejuDAgMBAAECgYBWbqOn2803DZHlhIexboW/dkoYlo597zF7gSJvJk+Kp/7nLmXLCnrcFoOQ2pjW+mRE0QO72jUTOXJlrPbFeO83Lcqc/M8SYMkgmgCCsQM+HI5r/qk8E34O6dtRu13n9g9uuFsIcZbLx+IX6qG0XuOKOlA4BAEsjbR3jGql2/edQQJBAMHO5bMXCqwl+03+2oVXCkXNNhC6jf7vsL1AzwDrjCbiF56tS3A9gNBVZZrnBo+0ey/fBp9IrG/qcBhvrYxI7WMCQQCvrQQD/P20sxzgL4/GBOMuWSLWsnTNa/2SMTgVB8p7fUr9xVceOPYTqnGVXbFa5StQJ5T6CJvMjWflbIdOOWNhAkAdnFvR8fpKdP8hWofOiY7jPUg+ZBJf2gU51RYLgPGH21FaiAWXn3331qRQd220NRIBLWUYnwThkIMR6LYuUdIbAkB0XPP1+FPMp3+O97ISBha9EonDEH3Ru6BAf52YQIrcdUeBBIAKIszMhe+qcl8RyA6Cj1VcsOsR+PBCxTpylAzBAkBKfCIS4eJcfWisk7ybOpdRhuoWYIte1w2Iu3O9yp1xRXweFSc24Jl2yU3L1pPbpG2YdezlfopWX9xS6+3jG45b, MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCE/2rg51IXvBv66uRPBHYDYNKz83ffn+wPkkHLXPWBVB3U+8fF3dW2YK91mXr4MxYJTNl+ssZM3hFLHILg9ANM108yxXAlr3hyBDi4vh08s/rt+ZE/Y90WOmXB6Dy/ol/9r1NnAzu37I1CF60yGssKahbvSuvvDJ+X/tXIYHo7gwIDAQAB]");
@@ -80,5 +85,24 @@ public class ModuleTests {
         boolean validate = signature.serverValidate(requestPayload);
         Assert.isTrue(validate);
         System.out.println(requestPayload);
+    }
+
+    @Test
+    public void rpcEncryptUtilTest() {
+        // init
+        ClientInfoStorage clientInfoStorage = new InMemoryClientInfoStorage();
+        clientInfoStorage.init(Collections.singletonList(requestPayload.getClientInfo()));
+        RpcEncrypt rpcEncrypt = RpcEncrypt.builder().signature(new RSASignature()).clientInfoStorage(clientInfoStorage).build();
+        RpcEncryptUtil.setRpcEncrypt(rpcEncrypt);
+        // run
+        RequestPayload requestPayload = RpcEncryptUtil.work(ModuleTests.requestPayload);
+        System.out.println(requestPayload);
+        System.out.println();
+
+        requestPayload.setMode(Mode.SERVER);
+        requestPayload = RpcEncryptUtil.work(ModuleTests.requestPayload);
+        System.out.println(requestPayload);
+
+        Assert.notNull(requestPayload);
     }
 }

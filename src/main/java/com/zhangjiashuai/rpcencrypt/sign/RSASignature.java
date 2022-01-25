@@ -6,15 +6,13 @@ import cn.hutool.crypto.KeyUtil;
 import cn.hutool.crypto.asymmetric.AsymmetricAlgorithm;
 import cn.hutool.crypto.asymmetric.AsymmetricCrypto;
 import cn.hutool.crypto.asymmetric.KeyType;
-import cn.hutool.crypto.digest.DigestUtil;
-import cn.hutool.crypto.digest.HMac;
-import cn.hutool.crypto.digest.HmacAlgorithm;
 import com.zhangjiashuai.rpcencrypt.cipher.AESCipher;
 import com.zhangjiashuai.rpcencrypt.cipher.Cipher;
 import com.zhangjiashuai.rpcencrypt.digest.Digest;
-import com.zhangjiashuai.rpcencrypt.digest.HmacDigest;
+import com.zhangjiashuai.rpcencrypt.digest.HMACDigest;
 import com.zhangjiashuai.rpcencrypt.entity.ClientInfo;
 import com.zhangjiashuai.rpcencrypt.entity.RequestPayload;
+import com.zhangjiashuai.rpcencrypt.entity.StatefulRequestPayload;
 
 import java.security.KeyPair;
 
@@ -30,7 +28,7 @@ public class RSASignature implements Signature {
     private Cipher cipher;
 
     public RSASignature() {
-        this(new HmacDigest(), new AESCipher());
+        this(new HMACDigest(), new AESCipher());
     }
 
     public RSASignature(Digest digest, Cipher cipher) {
@@ -39,7 +37,7 @@ public class RSASignature implements Signature {
     }
 
     @Override
-    public String clientSign(RequestPayload requestPayload) {
+    public String clientSign(StatefulRequestPayload requestPayload) {
         ClientInfo clientInfo = requestPayload.getClientInfo();
         AsymmetricCrypto clientCrypto = new AsymmetricCrypto(ALGORITHM, null, clientInfo.getPublicKeyServer());
         byte[] data = StrUtil.bytes(getStr2Sign(requestPayload));
@@ -59,7 +57,7 @@ public class RSASignature implements Signature {
     }
 
     @Override
-    public boolean serverValidate(RequestPayload requestPayload) throws SignatureMismatchException {
+    public boolean serverValidate(StatefulRequestPayload requestPayload) throws SignatureMismatchException {
         String clientSign = requestPayload.getSign();
         if (clientSign == null) {
             throw new NullPointerException("signature must not be null");

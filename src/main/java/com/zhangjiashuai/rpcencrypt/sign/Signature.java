@@ -4,6 +4,7 @@ import com.zhangjiashuai.rpcencrypt.common.Algorithm;
 import com.zhangjiashuai.rpcencrypt.common.Mode;
 import com.zhangjiashuai.rpcencrypt.entity.ClientInfo;
 import com.zhangjiashuai.rpcencrypt.entity.RequestPayload;
+import com.zhangjiashuai.rpcencrypt.entity.StatefulRequestPayload;
 
 /**
  * 签名接口
@@ -13,14 +14,14 @@ public interface Signature extends Algorithm {
 
     String SIGN_SEPARATOR = ".";
 
-    default String getStr2Sign(RequestPayload requestPayload) {
+    default String getStr2Sign(StatefulRequestPayload requestPayload) {
         ClientInfo clientInfo = requestPayload.getClientInfo();
         return clientInfo.getClientId() + clientInfo.getClientSecret();
     }
 
-    boolean serverValidate(RequestPayload requestPayload);
+    boolean serverValidate(StatefulRequestPayload requestPayload) throws SignatureMismatchException;
 
-    String clientSign(RequestPayload requestPayload);
+    String clientSign(StatefulRequestPayload requestPayload);
 
     /**
      * 生成随机密钥

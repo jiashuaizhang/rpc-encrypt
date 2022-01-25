@@ -1,9 +1,12 @@
 package com.zhangjiashuai.rpcencrypt;
 
 import com.zhangjiashuai.rpcencrypt.common.Mode;
+import com.zhangjiashuai.rpcencrypt.entity.ClientInfo;
 import com.zhangjiashuai.rpcencrypt.entity.RequestPayload;
-import com.zhangjiashuai.rpcencrypt.sign.RSASignature;
+import com.zhangjiashuai.rpcencrypt.entity.StatefulRequestPayload;
 import com.zhangjiashuai.rpcencrypt.sign.Signature;
+import com.zhangjiashuai.rpcencrypt.sign.SignatureMismatchException;
+import com.zhangjiashuai.rpcencrypt.storage.ClientInfoStorage;
 
 /**
  * 程序入口
@@ -11,13 +14,23 @@ import com.zhangjiashuai.rpcencrypt.sign.Signature;
 public class RpcEncrypt {
 
     private Signature signature;
+    private ClientInfoStorage clientInfoStorage;
 
-    public RpcEncrypt() {
-        this(new RSASignature());
+    /**
+     * 构造器
+     * @return
+     */
+    public static Builder builder() {
+        return new Builder();
     }
 
-    public RpcEncrypt(Signature signature) {
+    public RpcEncrypt() {
+
+    }
+
+    public RpcEncrypt(Signature signature, ClientInfoStorage clientInfoStorage) {
         this.signature = signature;
+        this.clientInfoStorage = clientInfoStorage;
     }
 
     /**
@@ -27,7 +40,14 @@ public class RpcEncrypt {
      * @param requestPayload
      * @return
      */
-    RequestPayload work(RequestPayload requestPayload) {
+    RequestPayload work(StatefulRequestPayload requestPayload) throws SignatureMismatchException {
+        if (requestPayload.isFillClientInfo()) {
+            ClientInfo clientInfo = clientInfoStorage.find(requestPayload.getClientInfo());
+            if (clientInfo == null) {
+                throw new NullPointerException("no clientInfo from storage");
+            }
+            requestPayload.setClientInfo(clientInfo);
+        }
         if (requestPayload.getMode() == Mode.CLIENT) {
             return clientSign(requestPayload);
         }
@@ -40,7 +60,7 @@ public class RpcEncrypt {
      * @param requestPayload
      * @return
      */
-    public RequestPayload serverValidate(RequestPayload requestPayload) {
+    public RequestPayload serverValidate(StatefulRequestPayload requestPayload) throws SignatureMismatchException {
         signature.serverValidate(requestPayload);
         return requestPayload;
     }
@@ -51,8 +71,31 @@ public class RpcEncrypt {
      * @param requestPayload
      * @return
      */
-    public RequestPayload clientSign(RequestPayload requestPayload) {
+    public RequestPayload clientSign(StatefulRequestPayload requestPayload) {
         signature.clientSign(requestPayload);
         return requestPayload;
+    }
+
+    public static class Builder {
+
+        private RpcEncrypt rpcEncrypt;
+
+        public Builder() {
+            this.rpcEncrypt = new RpcEncrypt();
+        }
+
+        public Builder signature(Signature signature) {
+            rpcEncrypt.signature = signature;
+            return this;
+        }
+
+        public Builder clientInfoStorage(ClientInfoStorage clientInfoStorage) {
+            rpcEncrypt.clientInfoStorage = clientInfoStorage;
+            return this;
+        }
+
+        public RpcEncrypt build() {
+            return rpcEncrypt;
+        }
     }
 }

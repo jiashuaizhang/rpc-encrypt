@@ -3,6 +3,7 @@ package com.zhangjiashuai.rpcencrypt.cipher;
 import com.zhangjiashuai.rpcencrypt.common.Algorithm;
 import com.zhangjiashuai.rpcencrypt.entity.ClientInfo;
 import com.zhangjiashuai.rpcencrypt.entity.RequestPayload;
+import com.zhangjiashuai.rpcencrypt.entity.StatefulRequestPayload;
 
 import javax.crypto.SecretKey;
 
@@ -11,7 +12,7 @@ import javax.crypto.SecretKey;
  */
 public interface Cipher extends Algorithm {
 
-    default String encrypt(RequestPayload requestPayload) {
+    default String encrypt(StatefulRequestPayload requestPayload) {
         return encrypt(requestPayload.getPayload(), requestPayload.getClientInfo());
     }
 

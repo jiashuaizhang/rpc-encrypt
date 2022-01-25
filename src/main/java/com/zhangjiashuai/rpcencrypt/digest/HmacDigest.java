@@ -9,7 +9,7 @@ import com.zhangjiashuai.rpcencrypt.entity.ClientInfo;
 /**
  * hmac摘要
  */
-public class HmacDigest implements Digest {
+public class HMACDigest implements Digest {
 
     private static final HmacAlgorithm HMAC_ALGORITHM = HmacAlgorithm.HmacSHA256;
 
