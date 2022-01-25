@@ -2,7 +2,7 @@
 
 autonumber
 
-Invoker -> Signature: Request{clientId,clientSecret,payload}
+Invoker -> Signature: Request{clientId,clientSecret,pubKey,payload}
 Signature -> Cipher: AESEnc(clientSecret,payload)
 Signature <-- Cipher: encryptPayload
 Signature -> Digest: HMAC(encryptPayload,clientSecret + pubKey)

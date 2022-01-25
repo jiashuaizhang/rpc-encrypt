@@ -2,29 +2,22 @@ package com.zhangjiashuai.rpcencrypt.sign;
 
 public class SignatureMismatchException extends RuntimeException {
 
-    private String serverSign;
-
     public SignatureMismatchException() {
     }
 
-    public SignatureMismatchException(String serverSign) {
-        this(serverSign, null);
+    public SignatureMismatchException(String message) {
+        super(message);
     }
 
-    public SignatureMismatchException(String serverSign, Throwable cause) {
-        super(serverSign, cause);
-        this.serverSign = serverSign;
+    public SignatureMismatchException(String message, Throwable cause) {
+        super(message, cause);
     }
 
     public SignatureMismatchException(Throwable cause) {
         super(cause);
     }
 
-    public String getServerSign() {
-        return serverSign;
-    }
-
-    public void setServerSign(String serverSign) {
-        this.serverSign = serverSign;
+    public SignatureMismatchException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+        super(message, cause, enableSuppression, writableStackTrace);
     }
 }
