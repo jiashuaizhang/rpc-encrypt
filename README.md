@@ -32,6 +32,13 @@
 
 ##### 1.2.2 客户端处理流程
 
+程序参与方:
+- Invoker: 调用者，即程序引用方;
+- Signature: 签名接口，默认实现为RSA. 持有Digest和Cipher的引用;
+- Digest: 摘要接口，默认实现为HMAC;
+- Cipher: 加密接口，默认实现为AES;
+- Storage: 存储接口，默认实现为内存。
+
 ![client_sign](src/test/java/resources/client_sign.png)
 
 ##### 1.2.3 服务端端处理流程
