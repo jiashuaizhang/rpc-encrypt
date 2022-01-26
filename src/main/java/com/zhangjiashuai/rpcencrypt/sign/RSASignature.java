@@ -22,6 +22,7 @@ import java.security.KeyPair;
 public class RSASignature implements Signature {
 
     private static final AsymmetricAlgorithm ALGORITHM = AsymmetricAlgorithm.RSA_ECB_PKCS1;
+    private static final int MAX_ASYMMETRIC_ENCRYPT_LENGTH = 117;
 
     private Digest digest;
     private Cipher cipher;
@@ -33,6 +34,15 @@ public class RSASignature implements Signature {
     public RSASignature(Digest digest, Cipher cipher) {
         this.digest = digest;
         this.cipher = cipher;
+    }
+
+    @Override
+    public String getStr2Sign(StatefulRequestPayload requestPayload) {
+        String str2Sign = Signature.super.getStr2Sign(requestPayload);
+        if (StrUtil.length(str2Sign) <= MAX_ASYMMETRIC_ENCRYPT_LENGTH) {
+            return str2Sign;
+        }
+        return str2Sign.substring(0, MAX_ASYMMETRIC_ENCRYPT_LENGTH);
     }
 
     @Override
@@ -64,9 +74,9 @@ public class RSASignature implements Signature {
         if (clientSign == null) {
             throw new NullPointerException("signature must not be null");
         }
-        String[] signArray = clientSign.split("\\" + SIGN_SEPARATOR);
+        String[] signArray = StrUtil.splitToArray(clientSign, SIGN_SEPARATOR);
         if (signArray.length != 2) {
-            throw new SignatureMismatchException("invalid arguments: " + clientSign);
+            throw new SignatureMismatchException("invalid sign argument: " + clientSign);
         }
         // digest validate (signature part 2)
         String digestStr = digest.digestPayload(requestPayload);
@@ -79,7 +89,7 @@ public class RSASignature implements Signature {
         byte[] serverDecrypt = serverCrypto.decrypt(signArray[0], KeyType.PrivateKey);
         String serverDecryptStr = StrUtil.utf8Str(serverDecrypt);
         if (!serverDecryptStr.equals(getStr2Sign(requestPayload))) {
-            throw new SignatureMismatchException("signature mismatch");
+            throw new SignatureMismatchException("asymmetric signature mismatch");
         }
         // decrypt the payload
         if (requestPayload.isDecryptAfterValidate()) {

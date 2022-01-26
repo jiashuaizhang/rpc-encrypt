@@ -1,6 +1,7 @@
 package com.zhangjiashuai.rpcencrypt.storage;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.util.StrUtil;
 import com.zhangjiashuai.rpcencrypt.entity.ClientInfo;
 
 import java.util.Collection;
@@ -14,7 +15,7 @@ public interface ClientInfoStorage {
     ClientInfo findByClientId(String clientId);
 
     default ClientInfo find(ClientInfo clientInfo) {
-        if (clientInfo == null) {
+        if (clientInfo == null || StrUtil.isEmpty(clientInfo.getClientId())) {
             return null;
         }
         ClientInfo got = findByClientId(clientInfo.getClientId());
