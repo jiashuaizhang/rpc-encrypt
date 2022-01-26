@@ -1,6 +1,7 @@
 package com.zhangjiashuai.rpcencrypt.storage;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.bean.copier.CopyOptions;
 import cn.hutool.core.util.StrUtil;
 import com.zhangjiashuai.rpcencrypt.entity.ClientInfo;
 
@@ -22,7 +23,7 @@ public interface ClientInfoStorage {
         if (got == null) {
             return null;
         }
-        BeanUtil.copyProperties(got, clientInfo);
+        BeanUtil.copyProperties(got, clientInfo, CopyOptions.create().ignoreNullValue());
         return clientInfo;
     }
 

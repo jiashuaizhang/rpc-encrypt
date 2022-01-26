@@ -28,7 +28,7 @@ public class InMemoryClientInfoStorage implements ClientInfoStorage {
     @Override
     public void init(Collection<ClientInfo> collection) {
         if (CollUtil.isNotEmpty(collection)) {
-            this.clientIdKeyCache = collection.stream().collect(Collectors.toMap(ClientInfo::getClientId, clientInfo -> clientInfo,
+            clientIdKeyCache = collection.stream().collect(Collectors.toMap(ClientInfo::getClientId, clientInfo -> clientInfo,
                     (k, v) -> v, ConcurrentHashMap::new));
         } else {
             clientIdKeyCache = Collections.emptyMap();

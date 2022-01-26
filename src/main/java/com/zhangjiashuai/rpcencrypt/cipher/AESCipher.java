@@ -4,7 +4,6 @@ import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.crypto.KeyUtil;
 import cn.hutool.crypto.symmetric.SymmetricAlgorithm;
 import cn.hutool.crypto.symmetric.SymmetricCrypto;
-import com.sun.istack.internal.NotNull;
 
 import javax.crypto.SecretKey;
 
@@ -38,7 +37,7 @@ public class AESCipher implements Cipher {
         return ALGORITHM.getValue();
     }
 
-    protected byte[] wrapperKey(@NotNull String key) {
+    protected byte[] wrapperKey(String key) {
         byte[] bytes = key.getBytes(CHARSET);
         int lengthIn = bytes.length;
         if (lengthIn == KEY_LENGTH) {

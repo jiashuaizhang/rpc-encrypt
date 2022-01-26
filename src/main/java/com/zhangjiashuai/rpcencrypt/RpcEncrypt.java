@@ -6,7 +6,6 @@ import com.zhangjiashuai.rpcencrypt.common.Mode;
 import com.zhangjiashuai.rpcencrypt.digest.Digest;
 import com.zhangjiashuai.rpcencrypt.digest.HMACDigest;
 import com.zhangjiashuai.rpcencrypt.entity.ClientInfo;
-import com.zhangjiashuai.rpcencrypt.entity.RequestPayload;
 import com.zhangjiashuai.rpcencrypt.entity.StatefulRequestPayload;
 import com.zhangjiashuai.rpcencrypt.sign.RSASignature;
 import com.zhangjiashuai.rpcencrypt.sign.Signature;
