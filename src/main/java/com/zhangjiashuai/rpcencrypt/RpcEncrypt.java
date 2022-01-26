@@ -64,6 +64,7 @@ public class RpcEncrypt {
      * 服务端验签
      * 附带解密，除非设置requestPayload::decryptAfterValidate为false
      * @param requestPayload
+     * @throws SignatureMismatchException 签名不匹配
      * @return
      */
     public StatefulRequestPayload serverValidate(StatefulRequestPayload requestPayload) throws SignatureMismatchException {
@@ -80,6 +81,14 @@ public class RpcEncrypt {
     public StatefulRequestPayload clientSign(StatefulRequestPayload requestPayload) {
         signature.clientSign(requestPayload);
         return requestPayload;
+    }
+
+    public Signature getSignature() {
+        return signature;
+    }
+
+    public ClientInfoStorage getClientInfoStorage() {
+        return clientInfoStorage;
     }
 
     public static class Builder {

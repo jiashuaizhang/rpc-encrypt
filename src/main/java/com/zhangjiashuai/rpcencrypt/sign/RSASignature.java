@@ -105,11 +105,11 @@ public class RSASignature implements Signature {
     }
 
     @Override
-    public String[] generateKeyPair() {
-        KeyPair keyPair = KeyUtil.generateKeyPair(getAlgorithm());
-        return new String[]{Base64Encoder.encode(keyPair.getPrivate().getEncoded()), Base64Encoder.encode(keyPair.getPublic().getEncoded())};
+    public KeyPair generateKeyPair() {
+        return KeyUtil.generateKeyPair(getAlgorithm());
     }
 
+    @Override
     public Digest getDigest() {
         return digest;
     }
@@ -119,6 +119,7 @@ public class RSASignature implements Signature {
         this.digest = digest;
     }
 
+    @Override
     public Cipher getCipher() {
         return cipher;
     }

@@ -39,14 +39,14 @@
 - Signature: 签名接口，默认的非对称加密实现为RSA; 持有Digest和Cipher的引用; 签名由非对称加密后的少量信息，加上经Cipher加密后的密文摘要两部分组成；
 - Storage: 存储接口，默认实现为内存。
 
-![client_sign](src/test/java/resources/client_sign.png)
+![client_sign](src/test/resources/client_sign.png)
 
 ##### 1.2.3 服务端端处理流程
 
-![server_validate](src/test/java/resources/server_validate.png)
+![server_validate](src/test/resources/server_validate.png)
 
 ##### 1.2.4 程序设计
-![UML](src/test/java/resources/UML.png)
+![UML](src/test/resources/UML.png)
 
 ### 二、代码实现
 
