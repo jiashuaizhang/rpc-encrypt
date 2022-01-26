@@ -1,6 +1,7 @@
 package com.zhangjiashuai.rpcencrypt.sign;
 
 import cn.hutool.core.codec.Base64Encoder;
+import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.KeyUtil;
 import cn.hutool.crypto.asymmetric.AsymmetricAlgorithm;
@@ -39,10 +40,13 @@ public class RSASignature implements Signature {
     @Override
     public String getStr2Sign(StatefulRequestPayload requestPayload) {
         String str2Sign = Signature.super.getStr2Sign(requestPayload);
-        if (StrUtil.length(str2Sign) <= MAX_ASYMMETRIC_ENCRYPT_LENGTH) {
+        byte[] bytes = str2Sign.getBytes(CHARSET);
+        if (bytes.length <= MAX_ASYMMETRIC_ENCRYPT_LENGTH) {
             return str2Sign;
         }
-        return str2Sign.substring(0, MAX_ASYMMETRIC_ENCRYPT_LENGTH);
+        byte[] targetArray = new byte[MAX_ASYMMETRIC_ENCRYPT_LENGTH];
+        ArrayUtil.copy(bytes, targetArray, MAX_ASYMMETRIC_ENCRYPT_LENGTH);
+        return new String(targetArray, CHARSET);
     }
 
     @Override
@@ -50,7 +54,7 @@ public class RSASignature implements Signature {
         ClientInfo clientInfo = requestPayload.getClientInfo();
         // signature part 1
         AsymmetricCrypto clientCrypto = new AsymmetricCrypto(ALGORITHM, null, clientInfo.getPublicKeyServer());
-        byte[] data = StrUtil.bytes(getStr2Sign(requestPayload));
+        byte[] data = StrUtil.bytes(getStr2Sign(requestPayload), CHARSET);
         byte[] clientEncrypt = clientCrypto.encrypt(data, KeyType.PublicKey);
         String clientEncryptStr = Base64Encoder.encode(clientEncrypt);
         String payload;
@@ -87,7 +91,7 @@ public class RSASignature implements Signature {
         ClientInfo clientInfo = requestPayload.getClientInfo();
         AsymmetricCrypto serverCrypto = new AsymmetricCrypto(ALGORITHM, clientInfo.getPrivateKeyServer(), clientInfo.getPublicKeyServer());
         byte[] serverDecrypt = serverCrypto.decrypt(signArray[0], KeyType.PrivateKey);
-        String serverDecryptStr = StrUtil.utf8Str(serverDecrypt);
+        String serverDecryptStr = new String(serverDecrypt, CHARSET);
         if (!serverDecryptStr.equals(getStr2Sign(requestPayload))) {
             throw new SignatureMismatchException("asymmetric signature mismatch");
         }

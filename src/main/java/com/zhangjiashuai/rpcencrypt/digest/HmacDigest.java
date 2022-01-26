@@ -16,7 +16,7 @@ public class HMACDigest implements Digest {
     @Override
     public String digestPayload(String payload, ClientInfo clientInfo) {
         String salt = clientInfo.getPublicKeyServer() + clientInfo.getClientSecret();
-        HMac hmac = DigestUtil.hmac(HMAC_ALGORITHM, StrUtil.bytes(salt));
+        HMac hmac = DigestUtil.hmac(HMAC_ALGORITHM, StrUtil.bytes(salt, CHARSET));
         return hmac.digestHex(payload);
     }
 

@@ -1,9 +1,10 @@
 package com.zhangjiashuai.rpcencrypt.cipher;
 
-import cn.hutool.core.util.StrUtil;
+import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.crypto.KeyUtil;
 import cn.hutool.crypto.symmetric.SymmetricAlgorithm;
 import cn.hutool.crypto.symmetric.SymmetricCrypto;
+import com.sun.istack.internal.NotNull;
 
 import javax.crypto.SecretKey;
 
@@ -17,16 +18,14 @@ public class AESCipher implements Cipher {
 
     @Override
     public String encrypt(String payload, String key) {
-        String wrapperKey = wrapperKey(key);
-        SymmetricCrypto crypto = new SymmetricCrypto(ALGORITHM, StrUtil.bytes(wrapperKey));
-        return crypto.encryptBase64(payload);
+        SymmetricCrypto crypto = new SymmetricCrypto(ALGORITHM, wrapperKey(key));
+        return crypto.encryptBase64(payload.getBytes(CHARSET));
     }
 
     @Override
     public String decrypt(String payload, String key) {
-        String wrapperKey = wrapperKey(key);
-        SymmetricCrypto crypto = new SymmetricCrypto(ALGORITHM, StrUtil.bytes(wrapperKey));
-        return crypto.decryptStr(payload);
+        SymmetricCrypto crypto = new SymmetricCrypto(ALGORITHM, wrapperKey(key));
+        return crypto.decryptStr(payload.getBytes(CHARSET), CHARSET);
     }
 
     @Override
@@ -39,14 +38,23 @@ public class AESCipher implements Cipher {
         return ALGORITHM.getValue();
     }
 
-    protected String wrapperKey(String key) {
-        if (key.length() < KEY_LENGTH) {
-            return StrUtil.padAfter(key, KEY_LENGTH, '0');
+    protected byte[] wrapperKey(@NotNull String key) {
+        byte[] bytes = key.getBytes(CHARSET);
+        int lengthIn = bytes.length;
+        if (lengthIn == KEY_LENGTH) {
+            return bytes;
         }
-        if (key.length() > KEY_LENGTH) {
-            return key.substring(0, KEY_LENGTH);
+        byte[] targetArray = new byte[KEY_LENGTH];
+        if (lengthIn < KEY_LENGTH) {
+            ArrayUtil.copy(bytes, targetArray, lengthIn);
+            for (int i = KEY_LENGTH - lengthIn; i < KEY_LENGTH; i++) {
+                // '0'
+                targetArray[i] = 48;
+            }
+        } else {
+            ArrayUtil.copy(bytes, targetArray, KEY_LENGTH);
         }
-        return key;
+        return targetArray;
     }
 
 }
