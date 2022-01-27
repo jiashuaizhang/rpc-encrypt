@@ -124,7 +124,7 @@ public class RpcEncrypt {
         return clientInfoStorage;
     }
 
-    public static class Builder {
+    public static final class Builder {
 
         private Symmetric symmetric;
 

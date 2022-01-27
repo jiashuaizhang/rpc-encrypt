@@ -58,6 +58,22 @@ public class StatefulRequestPayload extends RequestPayload {
         this.mode = mode;
     }
 
+    private StatefulRequestPayload(Builder builder) {
+        setClientInfo(builder.clientInfo);
+        setSign(builder.sign);
+        setPayload(builder.payload);
+        setMode(builder.mode);
+        setEncryptBeforeDigest(builder.encryptBeforeDigest);
+        setDigest(builder.digest);
+        setDecryptAfterValidate(builder.decryptAfterValidate);
+        setFillClientInfo(builder.fillClientInfo);
+        setCheckArguments(builder.checkArguments);
+    }
+
+    public static Builder builder() {
+        return new Builder();
+    }
+
     public boolean isEncryptBeforeDigest() {
         return encryptBeforeDigest;
     }
@@ -116,5 +132,69 @@ public class StatefulRequestPayload extends RequestPayload {
                 ", fillClientInfo=" + fillClientInfo +
                 ", checkArguments=" + checkArguments +
                 "} " + super.toString();
+    }
+
+    public static final class Builder {
+        private ClientInfo clientInfo;
+        private String sign;
+        private String payload;
+        private Mode mode;
+        private boolean encryptBeforeDigest;
+        private boolean digest;
+        private boolean decryptAfterValidate;
+        private boolean fillClientInfo;
+        private boolean checkArguments;
+
+        private Builder() {
+        }
+
+        public Builder clientInfo(ClientInfo val) {
+            clientInfo = val;
+            return this;
+        }
+
+        public Builder sign(String val) {
+            sign = val;
+            return this;
+        }
+
+        public Builder payload(String val) {
+            payload = val;
+            return this;
+        }
+
+        public Builder mode(Mode val) {
+            mode = val;
+            return this;
+        }
+
+        public Builder encryptBeforeDigest(boolean val) {
+            encryptBeforeDigest = val;
+            return this;
+        }
+
+        public Builder digest(boolean val) {
+            digest = val;
+            return this;
+        }
+
+        public Builder decryptAfterValidate(boolean val) {
+            decryptAfterValidate = val;
+            return this;
+        }
+
+        public Builder fillClientInfo(boolean val) {
+            fillClientInfo = val;
+            return this;
+        }
+
+        public Builder checkArguments(boolean val) {
+            checkArguments = val;
+            return this;
+        }
+
+        public StatefulRequestPayload build() {
+            return new StatefulRequestPayload(this);
+        }
     }
 }

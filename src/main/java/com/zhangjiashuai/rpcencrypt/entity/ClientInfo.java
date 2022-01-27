@@ -35,6 +35,18 @@ public class ClientInfo {
     public ClientInfo() {
     }
 
+    private ClientInfo(Builder builder) {
+        setId(builder.id);
+        setClientId(builder.clientId);
+        setClientSecret(builder.clientSecret);
+        setPrivateKeyServer(builder.privateKeyServer);
+        setPublicKeyServer(builder.publicKeyServer);
+    }
+
+    public static Builder builder() {
+        return new Builder();
+    }
+
     public Long getId() {
         return id;
     }
@@ -80,5 +92,45 @@ public class ClientInfo {
         return "ClientInfo{" +
                 "clientId='" + clientId + '\'' +
                 '}';
+    }
+
+    public static final class Builder {
+        private Long id;
+        private String clientId;
+        private String clientSecret;
+        private String privateKeyServer;
+        private String publicKeyServer;
+
+        private Builder() {
+        }
+
+        public Builder id(Long val) {
+            id = val;
+            return this;
+        }
+
+        public Builder clientId(String val) {
+            clientId = val;
+            return this;
+        }
+
+        public Builder clientSecret(String val) {
+            clientSecret = val;
+            return this;
+        }
+
+        public Builder privateKeyServer(String val) {
+            privateKeyServer = val;
+            return this;
+        }
+
+        public Builder publicKeyServer(String val) {
+            publicKeyServer = val;
+            return this;
+        }
+
+        public ClientInfo build() {
+            return new ClientInfo(this);
+        }
     }
 }
