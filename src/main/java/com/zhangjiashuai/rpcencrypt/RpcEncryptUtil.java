@@ -2,10 +2,11 @@ package com.zhangjiashuai.rpcencrypt;
 
 import cn.hutool.core.codec.Base64Encoder;
 import cn.hutool.core.collection.ListUtil;
-import com.zhangjiashuai.rpcencrypt.cipher.Cipher;
 import com.zhangjiashuai.rpcencrypt.entity.StatefulRequestPayload;
 import com.zhangjiashuai.rpcencrypt.sign.Signature;
 import com.zhangjiashuai.rpcencrypt.sign.SignatureMismatchException;
+import com.zhangjiashuai.rpcencrypt.sign.asymmetric.Asymmetric;
+import com.zhangjiashuai.rpcencrypt.symmetric.Symmetric;
 
 import javax.crypto.SecretKey;
 import java.security.KeyPair;
@@ -62,7 +63,8 @@ public class RpcEncryptUtil {
      */
     public static List<String> generateKeyPair() {
         Signature signature = RPC_ENCRYPT.getSignature();
-        KeyPair keyPair = signature.generateKeyPair();
+        Asymmetric cipher = signature.getAsymmetricCipher();
+        KeyPair keyPair = cipher.generateKeyPair();
         return ListUtil.of(Base64Encoder.encode(keyPair.getPrivate().getEncoded()), Base64Encoder.encode(keyPair.getPublic().getEncoded()));
     }
 
@@ -73,7 +75,7 @@ public class RpcEncryptUtil {
      */
     public static String generateKey() {
         Signature signature = RPC_ENCRYPT.getSignature();
-        Cipher cipher = signature.getCipher();
+        Symmetric cipher = signature.getSymmetricCipher();
         SecretKey secretKey = cipher.generateKey();
         return Base64Encoder.encode(secretKey.getEncoded());
     }

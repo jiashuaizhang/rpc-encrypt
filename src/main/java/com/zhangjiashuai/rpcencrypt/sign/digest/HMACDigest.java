@@ -1,4 +1,4 @@
-package com.zhangjiashuai.rpcencrypt.digest;
+package com.zhangjiashuai.rpcencrypt.sign.digest;
 
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.digest.DigestUtil;

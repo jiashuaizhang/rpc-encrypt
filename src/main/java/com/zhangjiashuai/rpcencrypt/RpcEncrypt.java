@@ -1,17 +1,19 @@
 package com.zhangjiashuai.rpcencrypt;
 
-import com.zhangjiashuai.rpcencrypt.cipher.AESCipher;
-import com.zhangjiashuai.rpcencrypt.cipher.Cipher;
 import com.zhangjiashuai.rpcencrypt.common.Mode;
-import com.zhangjiashuai.rpcencrypt.digest.Digest;
-import com.zhangjiashuai.rpcencrypt.digest.HMACDigest;
 import com.zhangjiashuai.rpcencrypt.entity.ClientInfo;
 import com.zhangjiashuai.rpcencrypt.entity.StatefulRequestPayload;
-import com.zhangjiashuai.rpcencrypt.sign.RSASignature;
+import com.zhangjiashuai.rpcencrypt.sign.DefaultSignature;
 import com.zhangjiashuai.rpcencrypt.sign.Signature;
 import com.zhangjiashuai.rpcencrypt.sign.SignatureMismatchException;
+import com.zhangjiashuai.rpcencrypt.sign.asymmetric.Asymmetric;
+import com.zhangjiashuai.rpcencrypt.sign.asymmetric.RSACipher;
+import com.zhangjiashuai.rpcencrypt.sign.digest.Digest;
+import com.zhangjiashuai.rpcencrypt.sign.digest.HMACDigest;
 import com.zhangjiashuai.rpcencrypt.storage.ClientInfoStorage;
 import com.zhangjiashuai.rpcencrypt.storage.InMemoryClientInfoStorage;
+import com.zhangjiashuai.rpcencrypt.symmetric.AESCipher;
+import com.zhangjiashuai.rpcencrypt.symmetric.Symmetric;
 
 /**
  * 程序入口
@@ -30,7 +32,7 @@ public class RpcEncrypt {
     }
 
     public RpcEncrypt() {
-        this(new RSASignature(), new InMemoryClientInfoStorage());
+        this(new DefaultSignature(), new InMemoryClientInfoStorage());
     }
 
     public RpcEncrypt(Signature signature, ClientInfoStorage clientInfoStorage) {
@@ -92,7 +94,9 @@ public class RpcEncrypt {
 
     public static class Builder {
 
-        private Cipher cipher;
+        private Symmetric symmetric;
+
+        private Asymmetric asymmetric;
 
         private Digest digest;
 
@@ -110,8 +114,13 @@ public class RpcEncrypt {
             return this;
         }
 
-        public Builder cipher(Cipher cipher) {
-            this.cipher = cipher;
+        public Builder symmetric(Symmetric symmetric) {
+            this.symmetric = symmetric;
+            return this;
+        }
+
+        public Builder asymmetric(Asymmetric asymmetric) {
+            this.asymmetric = asymmetric;
             return this;
         }
 
@@ -121,16 +130,20 @@ public class RpcEncrypt {
         }
 
         public RpcEncrypt build() {
-            if (cipher == null) {
-                cipher = new AESCipher();
+            if (symmetric == null) {
+                symmetric = new AESCipher();
+            }
+            if (asymmetric == null) {
+                asymmetric = new RSACipher();
             }
             if (digest == null) {
                 digest = new HMACDigest();
             }
             if (signature == null) {
-                signature = new RSASignature(digest, cipher);
+                signature = new DefaultSignature(digest, symmetric, asymmetric);
             } else {
-                signature.setCipher(cipher);
+                signature.setSymmetricCipher(symmetric);
+                signature.setAsymmetricCipher(asymmetric);
                 signature.setDigest(digest);
             }
             if (clientInfoStorage == null) {

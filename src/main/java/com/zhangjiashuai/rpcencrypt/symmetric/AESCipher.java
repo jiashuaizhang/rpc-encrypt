@@ -1,4 +1,4 @@
-package com.zhangjiashuai.rpcencrypt.cipher;
+package com.zhangjiashuai.rpcencrypt.symmetric;
 
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.crypto.KeyUtil;
@@ -10,7 +10,7 @@ import javax.crypto.SecretKey;
 /**
  * AES对称加密
  */
-public class AESCipher implements Cipher {
+public class AESCipher implements Symmetric {
 
     private static final SymmetricAlgorithm ALGORITHM = SymmetricAlgorithm.AES;
     private static final int KEY_LENGTH = 32;
@@ -24,7 +24,7 @@ public class AESCipher implements Cipher {
     @Override
     public String decrypt(String payload, String key) {
         SymmetricCrypto crypto = new SymmetricCrypto(ALGORITHM, wrapperKey(key));
-        return crypto.decryptStr(payload.getBytes(CHARSET), CHARSET);
+        return crypto.decryptStr(payload, CHARSET);
     }
 
     @Override

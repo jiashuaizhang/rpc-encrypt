@@ -1,9 +1,8 @@
-package com.zhangjiashuai.rpcencrypt.digest;
+package com.zhangjiashuai.rpcencrypt.sign.digest;
 
 import cn.hutool.core.util.StrUtil;
 import com.zhangjiashuai.rpcencrypt.common.Algorithm;
 import com.zhangjiashuai.rpcencrypt.entity.ClientInfo;
-import com.zhangjiashuai.rpcencrypt.entity.RequestPayload;
 import com.zhangjiashuai.rpcencrypt.entity.StatefulRequestPayload;
 
 /**

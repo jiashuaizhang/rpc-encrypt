@@ -2,14 +2,19 @@
 
 autonumber
 
-Invoker -> Signature: Request{clientId,encryptPayload}
-Signature -> STORAGE: findClientInfo(clientId)
-Signature <-- STORAGE: ClientInfo{priKey,clientSecret}
-Signature -> Digest: HMAC(encryptPayload,clientSecret + pubKey) & validate
-Signature <-- Digest: digest
-Signature -> Signature: sign = (RSADec(priKey) + "." + digest) & validate
-Signature -> Cipher: AESDec(clientSecret,encryptPayload)
-Signature <-- Cipher: payload
-Invoker <-- Signature: Response{payload}
+Invoker -> RpcEncrypt: Request{clientId,encryptPayload,sign}
+RpcEncrypt -> STORAGE: {clientId}
+RpcEncrypt <-- STORAGE: {clientSecret,priKey,pubKey}
+RpcEncrypt -> Signature: {clientId,clientSecret,priKey,pubKey,encryptPayload,sign}
+Signature -> Digest: {encryptPayload,clientSecret + pubKey)
+Signature <-- Digest: digest = HMAC(encryptPayload,clientSecret + pubKey)
+Signature -> Signature: validate digest (sign part 2
+Signature -> Asymmetric: {sign,priKey}
+Signature <-- Asymmetric: aysDec = RSADec(sign part1, priKey)
+Signature -> Signature: validate aysDec (sign part 1
+Signature -> Symmetric: {clientSecret,payload}
+Signature <-- Symmetric: payload = AESDec(clientSecret,payload)
+RpcEncrypt <-- Signature: payload
+Invoker <-- RpcEncrypt: Response{payload}
 
 @enduml

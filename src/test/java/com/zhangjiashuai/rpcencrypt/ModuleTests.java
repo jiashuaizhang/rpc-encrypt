@@ -6,7 +6,7 @@ import cn.hutool.core.util.StrUtil;
 import com.zhangjiashuai.rpcencrypt.common.Mode;
 import com.zhangjiashuai.rpcencrypt.entity.ClientInfo;
 import com.zhangjiashuai.rpcencrypt.entity.StatefulRequestPayload;
-import com.zhangjiashuai.rpcencrypt.sign.RSASignature;
+import com.zhangjiashuai.rpcencrypt.sign.DefaultSignature;
 import com.zhangjiashuai.rpcencrypt.sign.Signature;
 import com.zhangjiashuai.rpcencrypt.sign.SignatureMismatchException;
 import com.zhangjiashuai.rpcencrypt.storage.ClientInfoStorage;
@@ -17,7 +17,6 @@ import org.junit.jupiter.api.Test;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Predicate;
@@ -30,7 +29,7 @@ public class ModuleTests {
 
     @BeforeAll
     static void init() throws IOException {
-        signature = new RSASignature();
+        signature = new DefaultSignature();
         requestPayload = new StatefulRequestPayload();
         ClientInfo clientInfo = new ClientInfo();
         requestPayload.setClientInfo(clientInfo);
@@ -103,7 +102,7 @@ public class ModuleTests {
         // init
         ClientInfoStorage clientInfoStorage = new InMemoryClientInfoStorage();
         clientInfoStorage.init(Collections.singletonList(requestPayload.getClientInfo()));
-        RpcEncrypt rpcEncrypt = RpcEncrypt.builder().signature(new RSASignature()).clientInfoStorage(clientInfoStorage).build();
+        RpcEncrypt rpcEncrypt = RpcEncrypt.builder().clientInfoStorage(clientInfoStorage).build();
         RpcEncryptUtil.setRpcEncrypt(rpcEncrypt);
         // run
         try {

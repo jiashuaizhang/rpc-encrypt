@@ -78,11 +78,7 @@ public class ClientInfo {
     @Override
     public String toString() {
         return "ClientInfo{" +
-                "id=" + id +
-                ", clientId='" + clientId + '\'' +
-//                ", clientSecret='" + clientSecret + '\'' +
-//                ", privateKeyServer='" + privateKeyServer + '\'' +
-//                ", publicKeyServer='" + publicKeyServer + '\'' +
+                "clientId='" + clientId + '\'' +
                 '}';
     }
 }
