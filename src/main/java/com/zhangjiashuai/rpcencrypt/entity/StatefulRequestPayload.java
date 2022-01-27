@@ -28,6 +28,12 @@ public class StatefulRequestPayload extends RequestPayload {
      */
     private boolean fillClientInfo = true;
 
+    /**
+     * 是否校验参数
+     * 用来防止重复检验
+     */
+    private boolean checkArguments = true;
+
     public StatefulRequestPayload(RequestPayload requestPayload) {
         this(requestPayload.getClientInfo(), requestPayload.getSign(), requestPayload.getPayload(), Mode.CLIENT);
     }
@@ -80,5 +86,13 @@ public class StatefulRequestPayload extends RequestPayload {
                 ", fillClientInfo=" + fillClientInfo +
                 ", mode=" + mode +
                 "} " + super.toString();
+    }
+
+    public boolean isCheckArguments() {
+        return checkArguments;
+    }
+
+    public void setCheckArguments(boolean checkArguments) {
+        this.checkArguments = checkArguments;
     }
 }

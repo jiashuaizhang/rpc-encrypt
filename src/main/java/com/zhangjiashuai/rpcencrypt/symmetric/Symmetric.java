@@ -27,6 +27,11 @@ public interface Symmetric extends Cipher {
         return encrypt(payload, clientInfo.getClientSecret());
     }
 
+    @Override
+    default String decrypt(StatefulRequestPayload requestPayload) {
+        return decrypt(requestPayload.getPayload(), requestPayload.getClientInfo());
+    }
+
     /**
      * 对称解密
      * @param payload 报文

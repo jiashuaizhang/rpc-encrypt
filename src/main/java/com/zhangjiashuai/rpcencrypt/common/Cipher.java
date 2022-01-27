@@ -14,9 +14,7 @@ public interface Cipher extends Algorithm {
 
     String encrypt(String payload, String key);
 
-    default String decrypt(StatefulRequestPayload requestPayload) {
-        return decrypt(requestPayload.getPayload(), requestPayload.getClientInfo());
-    }
+    String decrypt(StatefulRequestPayload requestPayload);
 
     String decrypt(String payload, ClientInfo clientInfo);
 

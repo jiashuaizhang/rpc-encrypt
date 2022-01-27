@@ -1,5 +1,6 @@
 package com.zhangjiashuai.rpcencrypt;
 
+import cn.hutool.core.lang.Assert;
 import com.zhangjiashuai.rpcencrypt.common.Mode;
 import com.zhangjiashuai.rpcencrypt.entity.ClientInfo;
 import com.zhangjiashuai.rpcencrypt.entity.StatefulRequestPayload;
@@ -48,17 +49,11 @@ public class RpcEncrypt {
      * @return
      */
     StatefulRequestPayload work(StatefulRequestPayload requestPayload) throws SignatureMismatchException {
-        if (requestPayload.isFillClientInfo()) {
-            ClientInfo clientInfo = clientInfoStorage.find(requestPayload.getClientInfo());
-            if (clientInfo == null) {
-                throw new NullPointerException("no clientInfo from storage: " + requestPayload.getClientInfo());
-            }
-            requestPayload.setClientInfo(clientInfo);
+        beforeWork(requestPayload);
+        if (requestPayload.getMode() == Mode.SERVER) {
+            return serverValidate(requestPayload);
         }
-        if (requestPayload.getMode() == Mode.CLIENT) {
-            return clientSign(requestPayload);
-        }
-        return serverValidate(requestPayload);
+        return clientSign(requestPayload);
     }
 
     /**
@@ -69,6 +64,7 @@ public class RpcEncrypt {
      * @return
      */
     public StatefulRequestPayload serverValidate(StatefulRequestPayload requestPayload) throws SignatureMismatchException {
+        beforeWork(requestPayload);
         signature.serverValidate(requestPayload);
         return requestPayload;
     }
@@ -80,8 +76,43 @@ public class RpcEncrypt {
      * @return
      */
     public StatefulRequestPayload clientSign(StatefulRequestPayload requestPayload) {
+        beforeWork(requestPayload);
         signature.clientSign(requestPayload);
         return requestPayload;
+    }
+
+    protected void checkArguments(StatefulRequestPayload requestPayload) {
+        Assert.notEmpty(requestPayload.getPayload(), "payload can't be empty");
+        ClientInfo clientInfo = requestPayload.getClientInfo();
+        Assert.notNull(clientInfo, "clientInfo can't be null");
+        Assert.notEmpty(clientInfo.getClientId(), "clientId can't be empty");
+        Assert.notEmpty(clientInfo.getClientSecret(), "clientSecret can't be empty");
+        Assert.notEmpty(clientInfo.getPublicKeyServer(), "publicKeyServer can't be empty");
+        if (requestPayload.getMode() == Mode.SERVER) {
+            Assert.notEmpty(clientInfo.getPrivateKeyServer(), "privateKeyServer can't be empty");
+        }
+    }
+
+    /**
+     * 查询并填充clientInfo
+     * @param requestPayload
+     */
+    protected void fillClientInfo(StatefulRequestPayload requestPayload) {
+        ClientInfo clientInfo = clientInfoStorage.find(requestPayload.getClientInfo());
+        Assert.notNull(clientInfo, "no clientInfo from storage: " + requestPayload.getClientInfo());
+        requestPayload.setClientInfo(clientInfo);
+    }
+
+    protected void beforeWork(StatefulRequestPayload requestPayload) {
+        Assert.notNull(requestPayload, "requestPayload can't be null");
+        if (requestPayload.isCheckArguments()) {
+            checkArguments(requestPayload);
+            requestPayload.setCheckArguments(false);
+        }
+        if (requestPayload.isFillClientInfo()) {
+            fillClientInfo(requestPayload);
+            requestPayload.setFillClientInfo(false);
+        }
     }
 
     public Signature getSignature() {

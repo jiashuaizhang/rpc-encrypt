@@ -39,7 +39,6 @@
 - Digest: 摘要接口，默认实现为HMAC;
 - Asymmetric: 非对称加密接口，默认实现为RSA；
 - Symmetric: 对称加密接口，默认实现为AES;
-
 - Storage: 存储接口，默认实现为内存。
 
 ![client_sign](src/test/resources/client_sign.png)
