@@ -25,7 +25,7 @@ public class RpcEncryptUtil {
 
     /**
      * 签名或验签
-     * 附带加密（客户端），除非设置requestPayload::encryptBeforeSign为false
+     * 附带加密（客户端），除非设置requestPayload::encryptBeforeDigest为false
      * 附带解密（服务端），除非设置requestPayload::decryptAfterValidate为false
      * @param requestPayload
      * @throws SignatureMismatchException 服务端模式下签名不匹配
@@ -48,7 +48,7 @@ public class RpcEncryptUtil {
 
     /**
      * 客户端签名
-     * 附带加密，除非设置requestPayload::encryptBeforeSign为false
+     * 附带加密，除非设置requestPayload::encryptBeforeDigest为false
      * @param requestPayload
      * @return
      */

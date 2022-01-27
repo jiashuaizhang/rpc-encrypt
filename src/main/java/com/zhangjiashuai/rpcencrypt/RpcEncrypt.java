@@ -43,12 +43,12 @@ public class RpcEncrypt {
 
     /**
      * 签名或验签
-     * 附带加密（客户端），除非设置requestPayload::encryptBeforeSign为false
+     * 附带加密（客户端），除非设置requestPayload::encryptBeforeDigest为false
      * 附带解密（服务端），除非设置requestPayload::decryptAfterValidate为false
      * @param requestPayload
      * @return
      */
-    StatefulRequestPayload work(StatefulRequestPayload requestPayload) throws SignatureMismatchException {
+    public StatefulRequestPayload work(StatefulRequestPayload requestPayload) throws SignatureMismatchException {
         beforeWork(requestPayload);
         if (requestPayload.getMode() == Mode.SERVER) {
             return serverValidate(requestPayload);
@@ -71,7 +71,7 @@ public class RpcEncrypt {
 
     /**
      * 客户端签名
-     * 附带加密，除非设置requestPayload::encryptBeforeSign为false
+     * 附带加密，除非设置requestPayload::encryptBeforeDigest为false
      * @param requestPayload
      * @return
      */
@@ -90,6 +90,7 @@ public class RpcEncrypt {
         Assert.notEmpty(clientInfo.getPublicKeyServer(), "publicKeyServer can't be empty");
         if (requestPayload.getMode() == Mode.SERVER) {
             Assert.notEmpty(clientInfo.getPrivateKeyServer(), "privateKeyServer can't be empty");
+            Assert.notEmpty(requestPayload.getSign(), "sign can't be empty");
         }
     }
 
@@ -99,7 +100,7 @@ public class RpcEncrypt {
      */
     protected void fillClientInfo(StatefulRequestPayload requestPayload) {
         ClientInfo clientInfo = clientInfoStorage.find(requestPayload.getClientInfo());
-        Assert.notNull(clientInfo, "no clientInfo from storage: " + requestPayload.getClientInfo());
+        Assert.notNull(clientInfo, "no clientInfo found in the storage: " + requestPayload.getClientInfo());
         requestPayload.setClientInfo(clientInfo);
     }
 

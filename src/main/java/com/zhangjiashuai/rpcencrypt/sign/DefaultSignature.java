@@ -10,6 +10,8 @@ import com.zhangjiashuai.rpcencrypt.sign.digest.HMACDigest;
 import com.zhangjiashuai.rpcencrypt.symmetric.AESCipher;
 import com.zhangjiashuai.rpcencrypt.symmetric.Symmetric;
 
+import java.util.List;
+
 /**
  * 默认签名实现
  * RSA + HMAC
@@ -34,17 +36,21 @@ public class DefaultSignature implements Signature {
     public String clientSign(StatefulRequestPayload requestPayload) {
         ClientInfo clientInfo = requestPayload.getClientInfo();
         // signature part 1
-        String clientEncryptStr = asymmetricCipher.encrypt(requestPayload);
+        String str2Encrypt = asymmetricCipher.getStr2Encrypt(requestPayload);
+        String clientEncryptStr = asymmetricCipher.encrypt(str2Encrypt, clientInfo.getPublicKeyServer());
         String payload;
         // encrypt the payload
-        if (requestPayload.isEncryptBeforeSign()) {
+        if (requestPayload.isEncryptBeforeDigest()) {
             payload = symmetricCipher.encrypt(requestPayload);
         } else {
             payload = requestPayload.getPayload();
         }
         // signature part 2
-        String digestStr = digest.digestPayload(payload, clientInfo);
-        String sign = clientEncryptStr + SIGN_SEPARATOR + digestStr;
+        String sign = clientEncryptStr;
+        if (requestPayload.isDigest()) {
+            String digestStr = digest.digestPayload(payload, clientInfo);
+            sign += (SIGN_SEPARATOR + digestStr);
+        }
         requestPayload.setSign(sign);
         requestPayload.setPayload(payload);
         return sign;
@@ -53,21 +59,20 @@ public class DefaultSignature implements Signature {
     @Override
     public boolean serverValidate(StatefulRequestPayload requestPayload) throws SignatureMismatchException {
         String clientSign = requestPayload.getSign();
-        if (clientSign == null) {
-            throw new NullPointerException("signature must not be null");
-        }
-        String[] signArray = StrUtil.splitToArray(clientSign, SIGN_SEPARATOR);
-        if (signArray.length != 2) {
-            throw new SignatureMismatchException("invalid sign argument: " + clientSign);
-        }
+        List<String> signParts = StrUtil.split(clientSign, SIGN_SEPARATOR);
+        ClientInfo clientInfo = requestPayload.getClientInfo();
         // digest validate (signature part 2)
-        String digestStr = digest.digestPayload(requestPayload);
-        if (!digestStr.equals(signArray[1])) {
-            throw new SignatureMismatchException("digest mismatch");
+        if (requestPayload.isDigest()) {
+            if (signParts.size() < 2) {
+                throw new SignatureMismatchException("invalid sign argument, digest is missing: " + clientSign);
+            }
+            String digestStr = digest.digestPayload(requestPayload.getPayload(), clientInfo);
+            if (!digestStr.equals(signParts.get(1))) {
+                throw new SignatureMismatchException("digest mismatch");
+            }
         }
         // asymmetric validate (signature part 1)
-        ClientInfo clientInfo = requestPayload.getClientInfo();
-        String serverDecryptStr = asymmetricCipher.decrypt(signArray[0], clientInfo.getPrivateKeyServer());
+        String serverDecryptStr = asymmetricCipher.decrypt(signParts.get(0), clientInfo.getPrivateKeyServer());
         if (!serverDecryptStr.equals(asymmetricCipher.getStr2Encrypt(requestPayload))) {
             throw new SignatureMismatchException("asymmetric signature mismatch");
         }

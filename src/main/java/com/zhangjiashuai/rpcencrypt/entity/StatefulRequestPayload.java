@@ -6,17 +6,29 @@ import com.zhangjiashuai.rpcencrypt.common.Mode;
  * 有状态的请求报文
  */
 public class StatefulRequestPayload extends RequestPayload {
+
     /**
      * 运行模式
      */
     private Mode mode = Mode.CLIENT;
+
     /**
-     * 签名之前是否加密
-     * 默认为true,如果签名前已经显示执行过加密，需手动设置为false
+     * 摘要之前是否加密
+     * 用于客户端模式,先对称加密报文，再用密文做摘要
+     * 加密后的报文会设置到RequestPayload::payload,当关闭摘要(!this.digest)时，加密仍然会生效
+     * 默认为true,如果签名前已经显式执行过加密，需手动设置为false
      */
-    private boolean encryptBeforeSign = true;
+    private boolean encryptBeforeDigest = true;
+
+    /**
+     * 是否生成或校验摘要
+     * 默认为true
+     */
+    private boolean digest = true;
+
     /**
      * 验签之后是否解密
+     * 用于服务端模式,解密后的报文会设置到RequestPayload::payload
      * 默认为true,如果无需验签后自动解密，需手动设置为false
      */
     private boolean decryptAfterValidate = true;
@@ -46,12 +58,12 @@ public class StatefulRequestPayload extends RequestPayload {
         this.mode = mode;
     }
 
-    public boolean isEncryptBeforeSign() {
-        return encryptBeforeSign;
+    public boolean isEncryptBeforeDigest() {
+        return encryptBeforeDigest;
     }
 
-    public void setEncryptBeforeSign(boolean encryptBeforeSign) {
-        this.encryptBeforeSign = encryptBeforeSign;
+    public void setEncryptBeforeDigest(boolean encryptBeforeDigest) {
+        this.encryptBeforeDigest = encryptBeforeDigest;
     }
 
     public boolean isDecryptAfterValidate() {
@@ -78,21 +90,31 @@ public class StatefulRequestPayload extends RequestPayload {
         this.mode = mode;
     }
 
-    @Override
-    public String toString() {
-        return "StatefulRequestPayload{" +
-                "encryptBeforeSign=" + encryptBeforeSign +
-                ", decryptAfterValidate=" + decryptAfterValidate +
-                ", fillClientInfo=" + fillClientInfo +
-                ", mode=" + mode +
-                "} " + super.toString();
-    }
-
     public boolean isCheckArguments() {
         return checkArguments;
     }
 
     public void setCheckArguments(boolean checkArguments) {
         this.checkArguments = checkArguments;
+    }
+
+    public boolean isDigest() {
+        return digest;
+    }
+
+    public void setDigest(boolean digest) {
+        this.digest = digest;
+    }
+
+    @Override
+    public String toString() {
+        return "StatefulRequestPayload{" +
+                "mode=" + mode +
+                ", encryptBeforeDigest=" + encryptBeforeDigest +
+                ", digest=" + digest +
+                ", decryptAfterValidate=" + decryptAfterValidate +
+                ", fillClientInfo=" + fillClientInfo +
+                ", checkArguments=" + checkArguments +
+                "} " + super.toString();
     }
 }
